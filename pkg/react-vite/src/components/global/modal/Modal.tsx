@@ -23,9 +23,10 @@ export default function Modal(props: IModalProps) {
   const { message, icon, positive, negative } = props;
 
   return (
-    <div className="fixed top-0 left-0 w-screen h-screen bg-black/40">
+    <>
+      <div className="fixed top-0 left-0 w-screen h-screen bg-gray-950/60 backdrop-blur-sm"></div>
       <div className="fixed z-20 p-5 transition-all -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2">
-        <div className="flex flex-col justify-center gap-2 py-8 bg-white rounded-md shadow-lg px-7 bg">
+        <div className="flex flex-col justify-center gap-2 py-8 bg-white rounded-md shadow-lg px-7">
           <section className="flex flex-col items-center justify-center gap-5">
             <div className="flex flex-col items-center gap-2">
               {icon}
@@ -54,6 +55,6 @@ export default function Modal(props: IModalProps) {
           </section>
         </div>
       </div>
-    </div>
+    </>
   );
 }
