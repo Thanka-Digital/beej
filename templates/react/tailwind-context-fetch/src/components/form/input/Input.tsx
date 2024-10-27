@@ -1,41 +1,78 @@
-import { cn } from "@/helpers/styles/cn";
+import { ComponentProps, forwardRef } from "react";
+import { cva, VariantProps } from "class-variance-authority";
 
-interface InputProps
-  extends FormComponentVariantProps,
-    React.HTMLProps<HTMLInputElement> {
+import { cn } from "@/helpers/styles/cn";
+import {
+  colorSchemeForTextFields,
+  paddingVariantForTextFields,
+  variantForTextFields,
+} from "@/components/util";
+
+const inputStyles = cva(
+  [
+    "w-full disabled:cursor-not-allowed disabled:text-gray-400 disabled:bg-gray-200",
+  ],
+  {
+    variants: {
+      variant: variantForTextFields,
+      padding: paddingVariantForTextFields,
+      colorscheme: colorSchemeForTextFields,
+    },
+    defaultVariants: {
+      variant: "default",
+      padding: "base",
+      colorscheme: "gray",
+    },
+  }
+);
+
+interface IInputProps {
   className?: string;
   label?: string;
   id?: string;
 }
 
-export default function Input(props: InputProps) {
+type InputProps = ComponentProps<"input"> &
+  IInputProps &
+  VariantProps<typeof inputStyles>;
+
+export default forwardRef<HTMLInputElement, InputProps>(function Input(
+  props,
+  ref
+) {
   const {
     className = "",
     label = "",
     id = "",
-    textColor,
-    bgColor,
-    // variant,
-    borderColor,
+    variant,
+    padding,
+    colorscheme,
+    required,
+    disabled,
     ...rest
   } = props;
 
   return (
     <div className="flex flex-col w-full gap-1">
       <label htmlFor={id} className="font-medium">
-        {label}
+        {label} {required && <span className="text-danger">*</span>}
       </label>
       <input
+        ref={ref}
         id={id}
         className={cn(
-          "w-full rounded-md border p-2 disabled:cursor-not-allowed",
-          textColor,
-          bgColor,
-          borderColor,
-          className
+          inputStyles({
+            variant,
+            padding,
+            colorscheme,
+            className,
+          })
         )}
+        required={required}
+        disabled={disabled}
+        aria-disabled={disabled}
         {...rest}
       />
     </div>
   );
-}
+});

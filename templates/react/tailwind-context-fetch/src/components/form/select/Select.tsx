@@ -1,40 +1,72 @@
-import { cn } from "@/helpers/styles/cn";
+import { cva, VariantProps } from "class-variance-authority";
+import { ComponentProps, forwardRef } from "react";
 
-interface ISelectProps
-  extends FormComponentVariantProps,
-    React.HTMLProps<HTMLSelectElement> {
+import { cn } from "@/helpers/styles/cn";
+import {
+  colorSchemeForTextFields,
+  paddingVariantForTextFields,
+  variantForTextFields,
+} from "@/components/util";
+
+const selectStyles = cva(
+  [
+    "w-full disabled:cursor-not-allowed disabled:text-gray-400 disabled:bg-gray-200",
+  ],
+  {
+    variants: {
+      variant: variantForTextFields,
+      padding: paddingVariantForTextFields,
+      colorscheme: colorSchemeForTextFields,
+    },
+    defaultVariants: {
+      variant: "default",
+      padding: "base",
+      colorscheme: "gray",
+    },
+  }
+);
+
+interface ISelectProps {
   className?: string;
   options?: ({ label: string; value: string } & dynamicObject)[];
   label?: string;
   id?: string;
 }
 
-export default function Select(props: ISelectProps) {
+type SelectProps = ComponentProps<"select"> &
+  ISelectProps &
+  VariantProps<typeof selectStyles>;
+
+export default forwardRef<HTMLSelectElement, SelectProps>(function Select(
+  props,
+  ref
+) {
   const {
     className = "",
     label = "",
     id = "",
     options = [],
-    textColor,
-    bgColor,
-    // variant,
-    borderColor,
+    variant,
+    colorscheme,
+    padding,
+    disabled,
+    required,
     ...rest
   } = props;
 
   return (
     <div className="flex flex-col w-full gap-1">
       <label htmlFor={id} className="font-medium">
-        {label}
+        {label} {required && <span className="text-danger">*</span>}
       </label>
       <select
+        ref={ref}
         id={id}
+        required={required}
+        disabled={disabled}
+        aria-disabled={disabled}
         className={cn(
-          "w-full rounded-md border disabled:cursor-not-allowed p-2",
-          textColor,
-          bgColor,
-          borderColor,
-          className
+          selectStyles({ variant, padding, colorscheme, className })
         )}
         {...rest}
       >
@@ -46,4 +78,4 @@ export default function Select(props: ISelectProps) {
       </select>
     </div>
   );
-}
+});

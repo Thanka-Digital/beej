@@ -1,40 +1,72 @@
 import { cn } from "@/helpers/styles/cn";
+import { cva, VariantProps } from "class-variance-authority";
+import { ComponentProps, forwardRef } from "react";
+import {
+  colorSchemeForTextFields,
+  paddingVariantForTextFields,
+  variantForTextFields,
+} from "@/components/util";
 
-interface ITextareaProps
-  extends FormComponentVariantProps,
-    React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+const textareaStyles = cva(
+  [
+    "w-full disabled:cursor-not-allowed disabled:text-gray-400 disabled:bg-gray-200",
+  ],
+  {
+    variants: {
+      variant: variantForTextFields,
+      padding: paddingVariantForTextFields,
+      colorscheme: colorSchemeForTextFields,
+    },
+    defaultVariants: {
+      variant: "default",
+      padding: "base",
+      colorscheme: "gray",
+    },
+  }
+);
+
+interface ITextareaProps {
   label?: string;
   className?: string;
   id?: string;
 }
 
-export default function Textarea(props: ITextareaProps) {
+type TextareaProps = ComponentProps<"textarea"> &
+  ITextareaProps &
+  VariantProps<typeof textareaStyles>;
+
+export default forwardRef<HTMLTextAreaElement, TextareaProps>(function Textarea(
+  props,
+  ref
+) {
   const {
     className = "",
     label = "",
     id = "",
-    textColor,
-    bgColor,
-    borderColor,
+    required,
+    disabled,
+    variant,
+    colorscheme,
+    padding,
     ...rest
   } = props;
 
   return (
     <div className="flex flex-col w-full gap-1">
       <label htmlFor={id} className="font-medium">
-        {label}
+        {label} {required && <span className="text-danger">*</span>}
       </label>
       <textarea
         id={id}
+        ref={ref}
+        required={required}
+        disabled={disabled}
+        aria-disabled={disabled}
         className={cn(
-          "w-full rounded-md border disabled:cursor-not-allowed p-2",
-          textColor,
-          bgColor,
-          borderColor,
-          className
+          textareaStyles({ variant, padding, colorscheme, className })
         )}
         {...rest}
       />
     </div>
   );
-}
+});

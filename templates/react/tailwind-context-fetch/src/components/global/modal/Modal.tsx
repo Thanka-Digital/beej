@@ -1,19 +1,26 @@
 import Button from "@/components/form/button/Button";
-
+import {
+  colorSchemeForButton,
+  paddingVariantForButton,
+  variantForButton,
+} from "@/components/util";
+import { cn } from "@/helpers/styles/cn";
 export interface IModalProps {
   message: string;
   positive: {
     text: string;
-    textColor?: FormComponentVariantProps["textColor"];
-    bgColor?: FormComponentVariantProps["bgColor"];
-    borderColor?: FormComponentVariantProps["borderColor"];
+    colorScheme?: keyof typeof colorSchemeForButton;
+    variant?: keyof typeof variantForButton;
+    padding?: keyof typeof paddingVariantForButton;
+    className?: string;
     onClick: () => void;
   };
   negative: {
     text: string;
-    textColor?: FormComponentVariantProps["textColor"];
-    bgColor?: FormComponentVariantProps["bgColor"];
-    borderColor?: FormComponentVariantProps["borderColor"];
+    colorScheme?: keyof typeof colorSchemeForButton;
+    variant?: keyof typeof variantForButton;
+    padding?: keyof typeof paddingVariantForButton;
+    className?: string;
     onClick: () => void;
   };
   icon?: React.ReactNode;
@@ -34,19 +41,19 @@ export default function Modal(props: IModalProps) {
             </div>
             <div className="flex items-center justify-end w-full gap-2">
               <Button
-                className="px-4 py-1 rounded-md"
-                textColor={negative.textColor ?? "text-white"}
-                bgColor={negative.bgColor ?? "bg-danger"}
-                borderColor={negative.borderColor ?? "border-danger"}
+                className={cn("px-4 py-1 rounded-md", negative.className)}
+                colorscheme={negative.colorScheme ?? "danger"}
+                padding={negative.padding ?? "base"}
+                variant={negative.variant ?? "solid"}
                 onClick={negative.onClick}
               >
                 {negative.text}
               </Button>
               <Button
-                className="px-4 py-1 rounded-md"
-                textColor={negative.textColor ?? "text-white"}
-                bgColor={negative.bgColor ?? "bg-success"}
-                borderColor={negative.borderColor ?? "border-success"}
+                className={cn("px-4 py-1 rounded-md", positive.className)}
+                colorscheme={positive.colorScheme ?? "success"}
+                padding={positive.padding ?? "base"}
+                variant={positive.variant ?? "solid"}
                 onClick={positive.onClick}
               >
                 {positive.text}

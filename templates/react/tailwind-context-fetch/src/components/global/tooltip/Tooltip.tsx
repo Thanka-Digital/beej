@@ -50,22 +50,23 @@ export default function Tooltip(props: PropsWithChildren<ITooltipProps>) {
         {...getReferenceProps()}
       >
         {children}
+        {open && (
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            className={cn(
+              "px-2 py-1 text-xs rounded-md w-max",
+              bgColor,
+              textColor
+            )}
+            {...getFloatingProps()}
+          >
+            {/* TODO: Color for floating arrow */}
+            <FloatingArrow ref={arrowRef} context={context} />
+            {message}
+          </div>
+        )}
       </div>
-      {open && (
-        <div
-          ref={refs.setFloating}
-          style={floatingStyles}
-          className={cn(
-            "px-2 py-1 text-xs rounded-md w-max",
-            bgColor,
-            textColor
-          )}
-          {...getFloatingProps()}
-        >
-          <FloatingArrow ref={arrowRef} context={context} />
-          {message}
-        </div>
-      )}
     </>
   );
 }
