@@ -1,6 +1,8 @@
-import minimist from "minimist";
-import colors from "picocolors";
+import path from "path";
+import fs from "node:fs";
 import prompts from "prompts";
+import colors from "picocolors";
+import minimist from "minimist";
 
 const {
   cyanBright,
@@ -41,7 +43,7 @@ type ApiVariant = {
 const libraries: LibraryVariant[] = [
   {
     name: "react",
-    displayName: "Rect",
+    displayName: "React",
     color: cyanBright,
   },
   {
@@ -131,6 +133,9 @@ const APIS = [
 ];
 
 const defaultTargetDir = 'thanka-ui-starter-project';
+const renameFiles: Record<string, string> = {
+  '_gitignore': '.gitignore',
+}
 
 export const main = async () => {
   const argTargetDir = args._[0];
@@ -249,15 +254,95 @@ export const main = async () => {
   const templateStateVariant = state || argState;
   const templateApiVariant = api || argApi;
 
-  const templateVariant = `${templateRootLibrary}/${templateComponentVariant}-${templateStateVariant}-${templateApiVariant}`;
+  const templateVariant = `${templateComponentVariant}-${templateStateVariant}-${templateApiVariant}`;
 
   console.log('Project Name: ', projectName);
   console.log('Target Directory: ', targetDir);
   console.log('To use template folder: ', templateVariant);
+
+  const root = path.join(cwd, "__tests__"); // TODO: FOR TESTING __TESTS__
+  // const root = path.join(cwd, targetDir);
+
+  const pkgInfo = pkgInfoFromUserAgent(process.env.npm_config_user_agent);
+  const pkgManager = pkgInfo ? pkgInfo.name : 'pnpm';
+  const isYarn1 = pkgManager === 'yarn' && pkgInfo?.version.startsWith('1.');
+
+  // TODO: Custom command
+  console.log(`\n${cyanBright('✨  Creating project in')} ${cyanBright(root)}`);
+
+  const templateDir = path.resolve(__dirname, `../../templates/${templateRootLibrary}`, templateVariant);
+
+  const write = (file: string, content?: string) => {
+    const targetPath = path.join(root, renameFiles[file] ?? file);
+    if (content) {
+      fs.writeFileSync(targetPath, content);
+    } else {
+      copy(path.join(templateDir, file), targetPath);
+    }
+  }
+
+  const filesToCopy = fs.readdirSync(templateDir);
+  for (const file of filesToCopy.filter((f) => f !== 'package.json')) {
+    write(file);
+  }
+
+  const pkg = JSON.parse(fs.readFileSync(path.join(templateDir, 'package.json'), 'utf-8'));
+  pkg.name = projectName || "tests"; // TODO: check for valid project name
+  // pkg.name = projectName || targetDir;
+
+  write('package.json', JSON.stringify(pkg, null, 2) + '\n');
+
+  const cdProjectRelativePath = path.relative(cwd, root);
+  console.log(`\n${cyanBright('🎉  Successfully created project')} Get started by running:`);
+
+  if (cdProjectRelativePath) {
+    console.log(` cd ${cdProjectRelativePath.includes(' ') ? `"${cdProjectRelativePath}"` : cdProjectRelativePath}`);
+  }
+
+  switch (pkgManager) {
+    case 'yarn':
+      console.log(`   yarn`)
+      console.log(`   yarn dev`)
+      break;
+    default:
+      console.log(`   ${pkgManager} install`)
+      console.log(`   ${pkgManager} run dev`)
+      break;
+  }
+
+  console.log()
 }
 
 function formatTargetDir(targetDir: string | undefined) {
   return targetDir?.trim().replace(/\/+$/g, '')
+}
+
+function pkgInfoFromUserAgent(userAgent: string | undefined) {
+  if (!userAgent) return undefined;
+  const pkgSpec = userAgent.split(' ')[0];
+  const pkgSpecArr = pkgSpec.split('/');
+  return {
+    name: pkgSpecArr[0],
+    version: pkgSpecArr[1],
+  };
+}
+
+function copy(src: string, dest: string) {
+  const stat = fs.statSync(src)
+  if (stat.isDirectory()) {
+    copyDir(src, dest)
+  } else {
+    fs.copyFileSync(src, dest)
+  }
+}
+
+function copyDir(srcDir: string, destDir: string) {
+  fs.mkdirSync(destDir, { recursive: true })
+  for (const file of fs.readdirSync(srcDir)) {
+    const srcFile = path.resolve(srcDir, file)
+    const destFile = path.resolve(destDir, file)
+    copy(srcFile, destFile)
+  }
 }
 
 main();
