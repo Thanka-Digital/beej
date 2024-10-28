@@ -145,8 +145,10 @@ export const main = async () => {
   const argApi = args.api || args.a;
 
   let targetDir = argTargetDir || defaultTargetDir;
+  const getProjectName = () =>
+    targetDir === '.' ? path.basename(path.resolve()) : targetDir;
 
-  let result: prompts.Answers<'projectName' | 'library' | 'component' | 'state' | 'api'>;
+  let result: prompts.Answers<'projectName' | 'packageName' | 'library' | 'component' | 'state' | 'api' | 'overwrite'>;
   try {
     result = await prompts([
       {
@@ -157,6 +159,49 @@ export const main = async () => {
         onState: (state) => {
           targetDir = formatTargetDir(state.value) || defaultTargetDir;
         }
+      },
+      {
+        // TODO: Remove "__tests__" for production
+        type: () =>
+          !fs.existsSync("__tests__") || isEmpty("__tests__") ? null : 'select',
+        name: 'overwrite',
+        message: () =>
+          (targetDir === '.'
+            ? 'Current directory'
+            : `Target directory "${targetDir}"`) +
+          ` is not empty. Please choose how to proceed:`,
+        initial: 0,
+        choices: [
+          {
+            title: 'Remove existing files and continue',
+            value: 'yes',
+          },
+          {
+            title: 'Cancel operation',
+            value: 'no',
+          },
+          {
+            title: 'Ignore files and continue',
+            value: 'ignore',
+          },
+        ],
+      },
+      {
+        type: (_, { overwrite }: { overwrite?: string }) => {
+          if (overwrite === 'no') {
+            throw new Error(red('✖') + ' Operation cancelled')
+          }
+          return null
+        },
+        name: 'overwriteChecker',
+      },
+      {
+        type: () => (isValidPackageName(getProjectName()) ? null : 'text'),
+        name: 'packageName',
+        message: reset('Package name:'),
+        initial: () => toValidPackageName(getProjectName()),
+        validate: (dir) =>
+          isValidPackageName(dir) || 'Invalid package.json name',
       },
       {
         type:
@@ -247,7 +292,7 @@ export const main = async () => {
   }
 
   // get the prompts result
-  const { projectName, library, component, state, api } = result;
+  const { packageName, library, component, state, api, overwrite } = result;
 
   const templateRootLibrary = library || argLibrary;
   const templateComponentVariant = component || argComponent;
@@ -256,18 +301,18 @@ export const main = async () => {
 
   const templateVariant = `${templateComponentVariant}-${templateStateVariant}-${templateApiVariant}`;
 
-  console.log('Project Name: ', projectName);
-  console.log('Target Directory: ', targetDir);
-  console.log('To use template folder: ', templateVariant);
-
   const root = path.join(cwd, "__tests__"); // TODO: FOR TESTING __TESTS__
   // const root = path.join(cwd, targetDir);
 
+  if (overwrite === 'yes') {
+    emptyDir(root);
+  } else if (!fs.existsSync(root)) {
+    fs.mkdirSync(root, { recursive: true });
+  }
+
   const pkgInfo = pkgInfoFromUserAgent(process.env.npm_config_user_agent);
   const pkgManager = pkgInfo ? pkgInfo.name : 'pnpm';
-  const isYarn1 = pkgManager === 'yarn' && pkgInfo?.version.startsWith('1.');
 
-  // TODO: Custom command
   console.log(`\n${cyanBright('✨  Creating project in')} ${cyanBright(root)}`);
 
   const templateDir = path.resolve(__dirname, `../../templates/${templateRootLibrary}`, templateVariant);
@@ -277,6 +322,7 @@ export const main = async () => {
     if (content) {
       fs.writeFileSync(targetPath, content);
     } else {
+      console.log(`  ${cyanBright('Creating')} ${file}`);
       copy(path.join(templateDir, file), targetPath);
     }
   }
@@ -287,8 +333,7 @@ export const main = async () => {
   }
 
   const pkg = JSON.parse(fs.readFileSync(path.join(templateDir, 'package.json'), 'utf-8'));
-  pkg.name = projectName || "tests"; // TODO: check for valid project name
-  // pkg.name = projectName || targetDir;
+  pkg.name = packageName || getProjectName();
 
   write('package.json', JSON.stringify(pkg, null, 2) + '\n');
 
@@ -296,7 +341,7 @@ export const main = async () => {
   console.log(`\n${cyanBright('🎉  Successfully created project')} Get started by running:`);
 
   if (cdProjectRelativePath) {
-    console.log(` cd ${cdProjectRelativePath.includes(' ') ? `"${cdProjectRelativePath}"` : cdProjectRelativePath}`);
+    console.log(`   cd ${cdProjectRelativePath.includes(' ') ? `"${cdProjectRelativePath}"` : cdProjectRelativePath}`);
   }
 
   switch (pkgManager) {
@@ -315,6 +360,38 @@ export const main = async () => {
 
 function formatTargetDir(targetDir: string | undefined) {
   return targetDir?.trim().replace(/\/+$/g, '')
+}
+
+function isEmpty(path: string) {
+  const files = fs.readdirSync(path)
+  return files.length === 0 || (files.length === 1 && files[0] === '.git')
+}
+
+function emptyDir(dir: string) {
+  if (!fs.existsSync(dir)) {
+    return
+  }
+  for (const file of fs.readdirSync(dir)) {
+    if (file === '.git') {
+      continue
+    }
+    fs.rmSync(path.resolve(dir, file), { recursive: true, force: true })
+  }
+}
+
+function isValidPackageName(projectName: string) {
+  return /^(?:@[a-z\d\-*~][a-z\d\-*._~]*\/)?[a-z\d\-~][a-z\d\-._~]*$/.test(
+    projectName,
+  )
+}
+
+function toValidPackageName(projectName: string) {
+  return projectName
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, '-')
+    .replace(/^[._]/, '')
+    .replace(/[^a-z\d\-~]+/g, '-')
 }
 
 function pkgInfoFromUserAgent(userAgent: string | undefined) {
