@@ -2,12 +2,16 @@
   "name": "thanka-ui-starter-template",
   "version": "0.0.1",
   "description": "UI starter template with different options including Tailwind CSS, Chakra UI, Mantine, Redux, Jotai, and other configured options",
-  "main": "./cli/main.ts",
   "scripts": {
     "dev": "tsc && node dist/cli/main.js",
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "files": [
+    "dist",
+    "templates",
+    "index.js"
+  ],
   "bin": {
     "thanka-ui-starter": "./dist/index.js"
   },

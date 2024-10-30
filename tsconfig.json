@@ -13,6 +13,6 @@
     "skipLibCheck": true,
     "declaration": true
   },
-  "include": ["cli", "index.ts"],
+  "include": ["cli"],
   "exclude": ["node_modules", "dist", ".github"]
 }
