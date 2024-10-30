@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { Link } from "react-router-dom";
 
 // LAYOUTS
 import MaxWidthWrapper from "@/layout/wrapper/MaxWidthWrapper";

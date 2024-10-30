@@ -28,7 +28,7 @@ function UserWithDetailBtn() {
     <Button
       onClick={() => {
         userDispatch({
-          type: "SET_USER",
+          type: AppContextActionType.SET_USER,
           payload: { name: "User A", address: "L1" },
         });
       }}
