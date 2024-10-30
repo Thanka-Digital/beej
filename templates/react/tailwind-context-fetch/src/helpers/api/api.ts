@@ -1,4 +1,5 @@
 import { toast } from "sonner";
+import { errorParser } from "./errorParser";
 
 interface IBaseApiProps {
   url: string;
@@ -19,7 +20,7 @@ interface IDeleteApiProps extends IBaseApiProps {
   id: string;
 }
 
-// TODO: Add proper error handling and logging
+// TODO: Add proper logging
 const BASE_API_URL = import.meta.env.VITE_BASE_API_URL;
 
 export async function get(props: IBaseApiProps) {
@@ -29,7 +30,11 @@ export async function get(props: IBaseApiProps) {
       headers: getHeaders(props.needAuth ?? false),
     }
     const res = await fetch(BASE_API_URL + "/" + props.url, options);
-    return await res.json();
+    const data = await res.json();
+    if (data.error) {
+      return errorParser(data);
+    }
+    return data;
   } catch (error) {
     console.error(error);
     toast.error("Failed to fetch data. Try again later");
@@ -46,7 +51,11 @@ export async function post(props: IPostApiProps) {
       ...options,
       body: JSON.stringify(props.payload),
     });
-    return await res.json();
+    const data = await res.json();
+    if (data.error) {
+      return errorParser(data);
+    }
+    return data;
   } catch (error) {
     console.error(error);
     toast.error("Failed to add data. Try again later");
@@ -63,7 +72,11 @@ export async function update(props: IUpdateApiProps) {
       ...options,
       body: JSON.stringify(props.payload),
     });
-    return await res.json();
+    const data = await res.json();
+    if (data.error) {
+      return errorParser(data);
+    }
+    return data;
   } catch (error) {
     console.error(error);
     toast.error("Failed to update data. Try again later");
@@ -77,7 +90,11 @@ export async function deleteApi(props: IDeleteApiProps) {
       headers: getHeaders(props.needAuth ?? true),
     }
     const res = await fetch(`${BASE_API_URL}/${props.url}/${props.id}`, options);
-    return await res.json();
+    const data = await res.json();
+    if (data.error) {
+      return errorParser(data);
+    }
+    return data;
   } catch (error) {
     console.error(error);
     toast.error("Failed to delete data. Try again later");
@@ -85,11 +102,25 @@ export async function deleteApi(props: IDeleteApiProps) {
 }
 
 // TODO: Add strategy to handle authorization such as cookie, session, or token
-function getHeaders(needAuth: boolean, tokenKeyName: string = 'token') {
+function getHeaders(needAuth: boolean, tokenKeyName: string = 'token', strategy: TokenStrategy = 'local') {
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
   if (needAuth) {
-    headers.append('Authorization', 'Bearer ' + localStorage.getItem(tokenKeyName));
+    switch (strategy) {
+      case 'local':
+        headers.append('Authorization', 'Bearer ' + localStorage.getItem(tokenKeyName));
+        break;
+      case 'cookie':
+        // get cookie with tokenKeyName
+
+        // const cookies = ;
+
+        // headers.append('Authorization', 'Bearer ' + );
+        break;
+      case 'session':
+        headers.append('Authorization', 'Bearer ' + sessionStorage.getItem(tokenKeyName));
+        break;
+    }
   }
   return headers;
 }

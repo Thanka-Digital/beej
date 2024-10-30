@@ -46,6 +46,10 @@ export default function HomePage() {
           </Button>
         </Tooltip>
 
+        <Link to="/test" className="underline text-primary">
+          Go to test page to view context in action
+        </Link>
+
         <PortalModal />
       </MaxWidthWrapper>
     </main>

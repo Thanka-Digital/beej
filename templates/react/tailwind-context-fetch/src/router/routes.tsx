@@ -1,5 +1,6 @@
 import { createBrowserRouter, type RouteObject } from "react-router-dom";
-import HomePage from "../pages/HomePage";
+import HomePage from "@/pages/HomePage";
+import TestPage from "@/pages/TestPage";
 
 // Routes in application
 const routes: RouteObject[] = [
@@ -8,12 +9,8 @@ const routes: RouteObject[] = [
     element: <HomePage />,
   },
   {
-    path: "/about",
-    element: <>About Us</>,
-  },
-  {
-    path: "/faq",
-    element: <>FAQ</>,
+    path: "/test",
+    element: <TestPage />,
   },
   {
     path: "/services",
