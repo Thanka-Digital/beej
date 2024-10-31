@@ -1,6 +1,6 @@
 {
   "name": "thanka-ui-starter-template",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "UI starter template with different options including Tailwind CSS, Chakra UI, Mantine, Redux, Jotai, and other configured options",
   "type": "module",
   "scripts": {
