@@ -1,6 +1,6 @@
 {
   "name": "thanka-ui-starter-template",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "description": "UI starter template with different options including Tailwind CSS, Chakra UI, Mantine, Redux, Jotai, and other configured options",
   "type": "module",
   "scripts": {
@@ -15,11 +15,33 @@
     "templates",
     "index.js"
   ],
+  "engines": {
+    "node": "^18.0.0 || >=20.0.0"
+  },
   "bin": {
     "thanka-ui-starter": "index.js"
   },
-  "keywords": [],
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Thanka-Digital/thanka-UI-starter-template.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Thanka-Digital/thanka-UI-starter-template/issues"
+  },
+  "homepage": "https://github.com/Thanka-Digital/thanka-UI-starter-template#readme",
+  "keywords": [
+    "starter",
+    "template",
+    "tailwind",
+    "chakra",
+    "mantine",
+    "redux",
+    "jotai",
+    "ui",
+    "react",
+    "next"
+  ],
+  "author": "alsongarbuja",
   "license": "ISC",
   "devDependencies": {
     "@types/minimist": "^1.2.5",

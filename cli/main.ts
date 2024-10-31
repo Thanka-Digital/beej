@@ -4,7 +4,6 @@ import prompts from "prompts";
 import colors from "picocolors";
 import minimist from "minimist";
 import { fileURLToPath } from "url";
-// import { fileURLToPath } from "node:url";
 
 const {
   cyanBright,
