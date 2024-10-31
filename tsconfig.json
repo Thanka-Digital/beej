@@ -1,10 +1,9 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
+    "target": "ES2022",
+    "module": "ES2020",
     "lib": ["es6", "DOM"],
-    "rootDir": "./",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Bundler",
     "allowJs": true,
     "outDir": "dist",
     "esModuleInterop": true,

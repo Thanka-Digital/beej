@@ -4,6 +4,7 @@ import prompts from "prompts";
 import colors from "picocolors";
 import minimist from "minimist";
 import { fileURLToPath } from "url";
+// import { fileURLToPath } from "node:url";
 
 const {
   cyanBright,
@@ -162,9 +163,8 @@ export const main = async () => {
         }
       },
       {
-        // TODO: Remove "__tests__" for production
         type: () =>
-          !fs.existsSync("__tests__") || isEmpty("__tests__") ? null : 'select',
+          !fs.existsSync(targetDir) || isEmpty(targetDir) ? null : 'select',
         name: 'overwrite',
         message: () =>
           (targetDir === '.'
@@ -302,8 +302,8 @@ export const main = async () => {
 
   const templateVariant = `${templateComponentVariant}-${templateStateVariant}-${templateApiVariant}`;
 
-  const root = path.join(cwd, "__tests__"); // TODO: FOR TESTING __TESTS__
-  // const root = path.join(cwd, targetDir);
+  // const root = path.join(cwd, "__tests__");
+  const root = path.join(cwd, targetDir);
 
   if (overwrite === 'yes') {
     emptyDir(root);
