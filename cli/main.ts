@@ -4,7 +4,6 @@ import prompts from "prompts";
 import colors from "picocolors";
 import minimist from "minimist";
 import { fileURLToPath } from "url";
-// import { fileURLToPath } from "node:url";
 
 const {
   cyanBright,
@@ -316,7 +315,7 @@ export const main = async () => {
 
   console.log(`\n${cyanBright('✨  Creating project in')} ${cyanBright(root)}`);
 
-  const templateDir = path.resolve(fileURLToPath(import.meta.url), `../../templates/${templateRootLibrary}`, templateVariant);
+  const templateDir = path.resolve(fileURLToPath(import.meta.url), `../../../templates/${templateRootLibrary}`, templateVariant);
 
   const write = (file: string, content?: string) => {
     const targetPath = path.join(root, renameFiles[file] ?? file);
