@@ -68,7 +68,7 @@ pnpm dev
 
 > [!Tip]
 >
-> When testing the templates we are currently using the **tests** folder which is ignored by git as test folder. Add the `ENVIRONMENT=dev` or `ENVIRONMENT=test` in the `.env` file before running the **dev command**
+> When testing the templates we are currently using the `__tests__` folder which is ignored by git as test folder.
 
 ### 3. Making Changes
 

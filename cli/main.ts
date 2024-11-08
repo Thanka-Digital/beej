@@ -133,7 +133,7 @@ const APIS = [
   "tanstack",
 ];
 
-const defaultTargetDir = 'thanka-ui-starter-project';
+const defaultTargetDir = 'beej-app';
 const renameFiles: Record<string, string> = {
   '_gitignore': '.gitignore',
 }
@@ -145,15 +145,22 @@ export const main = async () => {
   const argState = args.state || args.s;
   const argApi = args.api || args.a;
 
-  let targetDir = argTargetDir || defaultTargetDir;
-  const getProjectName = () =>
-    targetDir === '.' ? path.basename(path.resolve()) : targetDir;
+  const environment = process.env.NODE_ENV || 'production';
+
+  let targetDir = environment === 'production' ? (argTargetDir || defaultTargetDir) : '__tests__';
+  const getProjectName = () => {
+    if (environment === 'production') {
+      return targetDir === '.' ? path.basename(path.resolve()) : targetDir;
+    }
+
+    return "test-beej-app";
+  }
 
   let result: prompts.Answers<'projectName' | 'packageName' | 'library' | 'component' | 'state' | 'api' | 'overwrite'>;
   try {
     result = await prompts([
       {
-        type: argTargetDir ? null : 'text',
+        type: (argTargetDir || environment !== 'production') ? null : 'text',
         name: 'projectName',
         message: reset('Project Name:'),
         initial: defaultTargetDir,
@@ -301,7 +308,6 @@ export const main = async () => {
 
   const templateVariant = `${templateComponentVariant}-${templateStateVariant}-${templateApiVariant}`;
 
-  // const root = path.join(cwd, "__tests__");
   const root = path.join(cwd, targetDir);
 
   if (overwrite === 'yes') {
@@ -315,7 +321,7 @@ export const main = async () => {
 
   console.log(`\n${cyanBright('✨  Creating project in')} ${cyanBright(root)}`);
 
-  const templateDir = path.resolve(fileURLToPath(import.meta.url), `../../../templates/${templateRootLibrary}`, templateVariant);
+  const templateDir = path.resolve(fileURLToPath(import.meta.url), `${environment === "production" ? "../../../templates/" : "../../templates/"}${templateRootLibrary}`, templateVariant);
 
   const write = (file: string, content?: string) => {
     const targetPath = path.join(root, renameFiles[file] ?? file);
