@@ -1,6 +1,6 @@
 {
   "name": "@thanka-digital/beej",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "description": "Starter template for web frontend projects with React, Next.js, TailwindCSS, ChakraUI, Mantine, Redux, Jotai, and many other foundational libraries already configured.",
   "type": "module",
   "scripts": {
